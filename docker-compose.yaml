@@ -31,6 +31,14 @@ services:
     volumes:
       - mongo_data:/data/db
 
+
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"    
+
+      
 volumes:
   mongo_data:
   kafka_kraft:

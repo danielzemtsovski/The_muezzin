@@ -1,6 +1,9 @@
 from create_metadata import CreateMetadata
 from files_path import FilesPath
 from kafka_publisher import KafkaPublisher
+import os
+
+folder = os.getenv("FOLDER_PATH")
 
 class Main:
     def __init__(self, folder_name):
@@ -18,5 +21,5 @@ class Main:
         self.kafka_publisher.finalize()
 
 if __name__ == "__main__":
-    app = Main("podcasts")
+    app = Main(folder)
     app.run()

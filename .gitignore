@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+send_metadata/podcasts/
+*.wav
+*.pdf
