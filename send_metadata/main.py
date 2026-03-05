@@ -2,6 +2,9 @@ from create_metadata import CreateMetadata
 from files_path import FilesPath
 from kafka_publisher import KafkaPublisher
 import os
+from logger import Logger
+
+logger = Logger.get_logger()
 
 folder = os.getenv("FOLDER_PATH")
 
@@ -11,14 +14,24 @@ class Main:
         self.files_path = FilesPath(folder_name)
         self.kafka_publisher = KafkaPublisher()
 
-    def run(self):            
-        files = self.files_path.get_all_paths()
-        for file in files:
-            metadata = CreateMetadata.get_metadata(file)
-            print(f"Publishing metadata for: {metadata['name']}")
+    def run(self):
+        try:
+            logger.info(f"Starting metadata processing service for folder: {folder}")           
+            files = self.files_path.get_all_paths()
 
-            self.kafka_publisher.publish_raw(metadata)
-        self.kafka_publisher.finalize()
+            for file in files:
+                try:
+                    metadata = self.create_metadata.get_metadata(file)
+                    self.kafka_publisher.publish_raw(metadata)
+                    logger.info(f"Successfully processed and published: {metadata['name']}")
+                except Exception as file_e:
+                    logger.error(f"Error processing individual file {file}: {str(file_e)}")
+
+            self.kafka_publisher.finalize()
+            logger.info("Service run completed successfully.")
+
+        except Exception as e:
+            logger.error(f"Critical error in Main run: {type(e).__name__} - {str(e)}")
 
 if __name__ == "__main__":
     app = Main(folder)

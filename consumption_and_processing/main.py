@@ -3,7 +3,9 @@ from kafkaconsumer import KafkaConsumer
 from unique_id import UniqueId
 from send_to_elastic import SendingToElastic
 from mongo_client import ClientMongo
+from logger import Logger
 
+logger = Logger.get_logger()
 
 class Main:
     def __init__(self):
@@ -16,24 +18,25 @@ class Main:
         try:
             updated_metadata = self.id_generator.add_id(metadata)
             uid = updated_metadata["uid"]
-            file_path = updated_metadata.get("path")
             
             self.elastic.send(updated_metadata)
 
-            if file_path:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                self.mongo.save_file(uid, content)
-        except Exception:
-            pass   
+            self.mongo.save_file(uid, updated_metadata)
+            
+            logger.info(f"Successfully processed and indexed task for UID: {uid}")
+        except Exception as e:
+            logger.error(f"Failed to process task: {type(e).__name__} - {str(e)}")   
 
     def run(self):
         try:
+            logger.info("The muazin consumer started successfully")
             while True:
                 metadata = self.kafka_consumer.consume()
                 if metadata:
                     self.process_task(metadata)
                 time.sleep(0.1)
+        except Exception as e:
+            logger.error(f"Critical error in main loop: {type(e).__name__} - {str(e)}")
         finally:
             self.mongo.close()
 

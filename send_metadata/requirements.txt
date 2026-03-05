@@ -1,5 +1,10 @@
-confluent-kafka==2.13.0
-SpeechRecognition==3.14.5
-standard-aifc==3.13.0
-standard-chunk==3.13.0
-typing_extensions==4.15.0
+elasticsearch==7.17.9
+confluent-kafka
+pymongo
+SpeechRecognition
+python-dateutil
+anyio
+dnspython
+sniffio
+standard-aifc
+standard-chunk

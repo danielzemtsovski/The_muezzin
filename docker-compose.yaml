@@ -36,7 +36,10 @@ services:
     image: elasticsearch:8.12.0
     container_name: elasticsearch
     ports:
-      - "9200:9200"    
+      - "9200:9200"
+    environment:
+    - xpack.security.enabled=false
+    - discovery.type=single-node
 
       
 volumes:
