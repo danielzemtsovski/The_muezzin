@@ -3,6 +3,7 @@ from files_path import FilesPath
 from kafka_publisher import KafkaPublisher
 import os
 from logger import Logger
+from speech_to_text import SpeechToText
 
 logger = Logger.get_logger()
 
@@ -13,6 +14,7 @@ class Main:
         self.create_metadata = CreateMetadata()
         self.files_path = FilesPath(folder_name)
         self.kafka_publisher = KafkaPublisher()
+        self.speech_to_text = SpeechToText()
 
     def run(self):
         try:
@@ -22,6 +24,11 @@ class Main:
             for file in files:
                 try:
                     metadata = self.create_metadata.get_metadata(file)
+                    file_path = metadata.get("path")
+                    transcript = self.speech_to_text.audio_file_to_text(file_path)
+                    metadata["transcript"] = transcript
+                    logger.info(f"Transcript added to metadata for: {file.name}")
+                    
                     self.kafka_publisher.publish_raw(metadata)
                     logger.info(f"Successfully processed and published: {metadata['name']}")
                 except Exception as file_e:
