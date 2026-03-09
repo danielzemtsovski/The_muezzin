@@ -18,10 +18,14 @@ class Main:
         try:
             updated_metadata = self.id_generator.add_id(metadata)
             uid = updated_metadata["uid"]
+            file_path = updated_metadata.get("path")
+
+            with open(file_path, "rb") as f:
+                file_bytes = f.read()
+
+            self.mongo.save_file(uid, file_bytes)
             
             self.elastic.send(updated_metadata)
-
-            self.mongo.save_file(uid, updated_metadata)
             
             logger.info(f"Successfully processed and indexed task for UID: {uid}")
         except Exception as e:
