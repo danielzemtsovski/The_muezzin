@@ -6,9 +6,9 @@ logger = Logger.get_logger()
 
 class SendingToElastic:
     def __init__(self):
-        elastic_uri =  os.getenv("ELASTIC_URI")
+        elastic_uri =  os.getenv("ELASTIC_URI", "http://elasticsearch:9200")
         self.es =Elasticsearch(elastic_uri)
-        self.index_name = "podcasts_metadata"
+        self.index_name = os.getenv("INDEX_NAME", "podcasts_metadata")
 
     def send(self, data):
         try:
