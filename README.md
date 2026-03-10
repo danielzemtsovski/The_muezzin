@@ -13,3 +13,7 @@ docker run --rm --network project_to_test_default -v "${PWD}/../podcasts:/app/po
 docker build -t threat_level .
 
 docker run --rm --network project_to_test_default --env-file ../.env threat_level
+
+docker build -t smart_questions .
+
+docker run --rm -p 8000:8000 --network project_to_test_default --env-file ../.env smart_questions
