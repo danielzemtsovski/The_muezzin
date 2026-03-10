@@ -41,7 +41,7 @@ services:
     - xpack.security.enabled=false
     - discovery.type=single-node
 
-      
+
 volumes:
   mongo_data:
   kafka_kraft:

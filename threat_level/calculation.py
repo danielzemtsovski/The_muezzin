@@ -31,5 +31,3 @@ class Calculation:
             bds_threat_level = "none"
         logger.info(f"Analyzed message: total_hostile={total_hostile}, percent={bds_percent:.2f}%, level={bds_threat_level}")
         return bds_percent, is_bds, bds_threat_level
-
-
