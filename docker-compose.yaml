@@ -50,6 +50,70 @@ services:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     depends_on:
       - elasticsearch
+  
+    
+  send_metadata:
+    build: ./send_metadata
+    container_name: send_metadata
+    environment:
+      KAFKA_URI: "kafka:9092"
+      KAFKA_TOPIC: "metadata_topic"
+      FOLDER_PATH: "/app/podcasts"
+      ES_HOST: "http://elasticsearch:9200"
+      LOG_INDEX: "logs_project_muazin"
+      LOGGER_NAME: "muazin_service_prod"
+    volumes:
+      - ../podcasts:/app/podcasts
+    depends_on:
+      - kafka
+      - elasticsearch
+
+  consumption_and_processing:
+    build: ./consumption_and_processing
+    container_name: consumption_and_processing
+    environment:
+      KAFKA_URI: "kafka:9092"
+      KAFKA_TOPIC: "metadata_topic"
+      MONGO_URI: "mongodb://root:root123@mongodb:27017/muezzin_db?authSource=admin"
+      ELASTIC_URI: "http://elasticsearch:9200"
+      INDEX_NAME: "podcasts_metadata"
+      LOGGER_NAME: "muazin_service_prod"
+      LOG_INDEX: "logs_project_muazin"
+      ES_HOST: "http://elasticsearch:9200"
+    volumes:
+      - ../podcasts:/app/podcasts 
+    depends_on:
+      - kafka
+      - mongodb
+      - elasticsearch
+
+  threat_level:
+    build: ./threat_level
+    container_name: threat_level
+    environment:
+      ELASTIC_URI: "http://elasticsearch:9200"
+      INDEX_NAME: "podcasts_metadata"
+      LOGGER_NAME: "threat_level_service"
+      LOG_INDEX: "logs_project_muazin"
+      HOSTILE_LIST_ENCODED: "RnJlZWRvbSBGbG90aWxsYSxSZXNpc3RhbmNlLExpYmVyYXRpb24sRnJlZSBQYWxlc3RpbmUsR2F6YSxDZWFzZWZpcmUsUHJvdGVzdCxVTlJXQQ=="
+      VERY_HOSTILE_LIST_ENCODED: "R2Vub2NpZGUsV2FyIENyaW1lcyxBcGFydGhlaWQsTWFzc2FjcmUsTmFrYmEsRGlzcGxhY2VtZW50LEh1bWFuaXRhcmlhbiBDcmlzaXMsQmxvY2thZGUsT2NjdXBhdGlvbixSZWZ1Z2VlcyxJQ0MsQkRT"
+    depends_on:
+      - elasticsearch
+
+  smart_questions:
+    build: ./smart_questions
+    container_name: smart_questions
+    ports:
+      - "8000:8000"
+    environment:
+      ELASTIC_URI: "http://elasticsearch:9200"
+      INDEX_NAME: "podcasts_metadata"
+      LOGGER_NAME: "smart_questions_api"
+      LOG_INDEX: "logs_project_muazin"
+      ES_HOST: "http://elasticsearch:9200"
+    depends_on:
+      - elasticsearch
+
 
 volumes:
   mongo_data:
